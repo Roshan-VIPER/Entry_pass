@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Happy Birthday Durga ❤️</title>
+  <title>Happy Birthday Diya ❤️</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -26,7 +26,7 @@
       overflow-x: hidden;
     }
 
-    /* --- Music Player --- */
+    /* --- Music Player Control --- */
     .music-player {
       position: absolute;
       top: 20px;
@@ -98,7 +98,7 @@
       line-height:1.7;
     }
 
-    /* --- ADD-ON: Interactive Scratch Card Stylings --- */
+    /* --- Interactive Scratch Card --- */
     .scratch-title {
       font-size: 1rem;
       color: #fff5b7;
@@ -149,7 +149,7 @@
       left: 0;
       cursor: pointer;
       z-index: 3;
-      touch-action: none; /* Prevents screen scrolling while scratching on mobile */
+      touch-action: none;
     }
 
     .heart{
@@ -158,7 +158,6 @@
       margin-top:25px;
     }
 
-    /* Button Layout adjustments */
     .btn-group {
       display: flex;
       justify-content: center;
@@ -184,16 +183,15 @@
       background:#fff5f8;
     }
 
-    /* Special style for our secondary custom button */
-    .btn-secondary {
-      background: transparent;
+    .btn-spotify {
+      background: #1DB954;
       color: white;
-      border: 2px solid white;
-      box-shadow: none;
+      box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
     }
-    .btn-secondary:hover, .btn-secondary:active {
-      background: rgba(255, 255, 255, 0.15);
+    .btn-spotify:hover, .btn-spotify:active {
+      background: #1ed760;
       color: white;
+      transform: scale(1.05);
     }
 
     @media (max-width: 480px) {
@@ -223,23 +221,19 @@
 </head>
 <body>
 
-  <!-- Background Music Player -->
   <div class="music-player" onclick="toggleMusic()">
     <div class="disc" id="musicDisc">♪</div>
     <span id="musicStatus">Play Music ♫</span>
   </div>
-  <!-- <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio> -->
   <audio id="bgMusic" loop src="96.mp3"></audio>
 
   <div class="container">
     <h1>Happy Birthday <span class="name">Durga (DIYA) ❤️</span></h1>
 
-    <!-- Typewriter Box -->
     <div class="typewriter-box">
       <p id="wishText"></p>
     </div>
 
-    <!-- NEW INTERACTIVE ADD-ON: Virtual Scratch Card -->
     <div class="scratch-title">Scratch here for your birthday gift! 🤫</div>
     <div class="scratch-container">
       <div class="scratch-reveal-text">
@@ -251,21 +245,19 @@
 
     <div class="heart">❤️</div>
 
-    <!-- Interactive Button Clusters -->
     <div class="btn-group">
       <button class="btn" onclick="showMessage()">
         Click Here 💌
       </button>
       
-      <!-- NEW INTERACTIVE ADD-ON: Dedicated Song Link (e.g. Spotify / YouTube link to her favorite track) -->
-      <button class="btn btn-secondary" onclick="openOurSong()">
-        Our Theme Song 🎵
+      <button class="btn btn-spotify" onclick="openSpotifyPlaylist()">
+        Our Spotify Playlist 🎧
       </button>
     </div>
   </div>
 
   <script>
-    // 1. Typewriter Animation Logic
+    // Typewriter
     const message = "Every moment with you feels special, but today is even more beautiful because it’s your day. You are the reason behind my smiles, my peace, and my happiness. I hope this year brings you endless happiness, beautiful memories, and all the love you deserve. No matter what, I’ll always be cheering for you. ✨";
     let index = 0;
     function typeEffect() {
@@ -280,16 +272,20 @@
       initScratchCard();
     };
 
-    // 2. Music Controller Logic
+    // Music control
     const music = document.getElementById("bgMusic");
     const disc = document.getElementById("musicDisc");
     const statusText = document.getElementById("musicStatus");
 
     function toggleMusic() {
       if (music.paused) {
-        music.play();
-        disc.style.animationPlayState = "running";
-        statusText.innerText = "Playing.. ♥";
+        music.play().then(() => {
+          disc.style.animationPlayState = "running";
+          statusText.innerText = "Playing.. ♥";
+        }).catch(err => {
+          console.log("Playback failed:", err);
+          alert("Click anywhere on the screen first to let the music play!");
+        });
       } else {
         music.pause();
         disc.style.animationPlayState = "paused";
@@ -297,19 +293,17 @@
       }
     }
 
-    // 3. NEW ADD-ON: HTML5 Scratch Card Interactive Logic
+    // Scratch Card
     function initScratchCard() {
       const canvas = document.getElementById("scratchCanvas");
       const ctx = canvas.getContext("2d");
       
-      // Paint the canvas with a beautiful sparkling silver/pink texture
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
       gradient.addColorStop(0, '#cfd9df');
       gradient.addColorStop(1, '#e2ebf0');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Add helper text overlay on top of the scratch coating
       ctx.fillStyle = "#ff4f81";
       ctx.font = "600 14px Poppins";
       ctx.textAlign = "center";
@@ -320,43 +314,36 @@
       function scratch(e) {
         if (!isDrawing) return;
         
-        // Handle desktop vs mobile coordinate differences accurately
         const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const x = clientX - rect.left;
         const y = clientY - rect.top;
 
-        // Use destination-out composition to transparently cut through the silver layer
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x, y, 20, 0, Math.PI * 2); // 20px circle brush size
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Desktop events
       canvas.addEventListener("mousedown", () => isDrawing = true);
       canvas.addEventListener("mouseup", () => isDrawing = false);
       canvas.addEventListener("mousemove", scratch);
 
-      // Mobile touch events
       canvas.addEventListener("touchstart", () => isDrawing = true);
       canvas.addEventListener("touchend", () => isDrawing = false);
       canvas.addEventListener("touchmove", scratch);
     }
 
-    // 4. Redirect Link out to her theme song
-    function openOurSong() {
-      // Switch this URL out with a link to her favorite track or playlist
-      window.open("https://open.spotify.com/playlist/6KyrUR0HOeKeKNrhuDFxNL?si=64JgvfKcRuyKlaJcQHCafA", "_blank");
+    function openSpotifyPlaylist() {
+      window.open("https://open.spotify.com/playlist/6KyrUR0HOeKeKNrhuDFxNL?si=jEF9WdHOSPmArqL_8XMzBQ", "_blank");
     }
 
-    // 5. Envelope Message Box
     function showMessage(){
       alert("I love you endlessly ❤️\nHappy Birthday My Love once again!");
     }
 
-    // 6. Ambient Floating Hearts Background 
+    // Hearts
     const heartCount = 20;
     for(let i = 0; i < heartCount; i++){
       let heart = document.createElement("div");
